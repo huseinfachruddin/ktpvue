@@ -19,14 +19,14 @@
               dense
               outlined
               solo
-              v-model="form.name"
-              label="Username"
+              v-model="form.email"
+              label="Email..."
               >
               </v-text-field>
                 <v-alert
                 dense
                 type="error"
-                v-for="error in errors.name" 
+                v-for="error in errors.email" 
                 :key="error">
                 {{error}}
                 </v-alert>
@@ -38,7 +38,7 @@
               solo
               type="password"
               v-model="form.password"
-              label="Password"
+              label="Password..."
             ></v-text-field>
                 <v-alert
                 dense

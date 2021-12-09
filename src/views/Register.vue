@@ -4,7 +4,22 @@
       <v-flex md6 sm8 >
         <div class="pa-5" >
           <h2 class="text-center ma-5 white--text">Register</h2>
-          
+          <div>
+            <h4 class="white--text">Masukan Foto KTP</h4>
+            <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" type="file" @vdropzone-complete="afterComplete" :v-model="form.img=img"
+            >
+            </vue-dropzone>
+                <br>
+                <v-alert
+                dense
+                type="error"
+                v-for="error in errors.img" 
+                :key="error">
+                {{error}}
+                </v-alert>
+          </div>      
+
+            <br>
           <div>
             <v-text-field
               dense
@@ -44,14 +59,14 @@
               dense
               outlined
               solo
-              v-model="form.phone"
-              label="Nomor telpon/WA"
+              v-model="form.nik"
+              label="Nomor Induk Kependudukan/KTP..."
               >
               </v-text-field>
                 <v-alert
                 dense
                 type="error"
-                v-for="error in errors.phone" 
+                v-for="error in errors.nik" 
                 :key="error">
                 {{error}}
                 </v-alert>
@@ -118,9 +133,29 @@
 </template>
 
 <script>
+import vue2Dropzone from 'vue2-dropzone'
+import 'vue2-dropzone/dist/vue2Dropzone.min.css'
+import { nikParser } from 'nik-parser'
+
 export default {
+  components:{
+    vueDropzone: vue2Dropzone
+  },
   data(){
     return{
+      img:null,
+      dropzoneOptions: {
+          url: 'https://httpbin.org/post',
+          thumbnailWidth: 300,
+          maxFiles: 1,
+          acceptedFiles: ".png,.jpg,.jpeg",
+          init : function() {
+            this.on("maxfilesexceeded", function(file) {
+                  this.removeAllFiles();
+                  this.addFile(file);
+            });
+          }
+      }
     }
   },
   computed:{
@@ -136,7 +171,15 @@ export default {
   },
   methods:{
     async register(form){
-      this.$store.dispatch('register',form)
+        let data=nikParser(form.nik)
+        if (data.isValid()) {
+          this.$store.dispatch('register',form)
+        }else{
+          alert('Nomor KTP tidak valid')
+        }
+    },
+    afterComplete(file){
+      this.img=file
     }
   }
 }

@@ -5,18 +5,7 @@ import vuerouter from 'vue-router'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 
-import Profile from '../views/Profile.vue'
-
 import Home from '../views/Home.vue'
-import Admin from '../views/Admin/Admin.vue'
-import User from '../views/Admin/User.vue'
-import Role from '../views/Admin/Role.vue'
-
-import Product from '../views/Admin/Product.vue'
-import Licence from '../views/Admin/Licence.vue'
-
-import userLicence from '../views/User/userLicence.vue'
-import userProduct from '../views/User/userProduct.vue'
 
 
 Vue.use(vuerouter)
@@ -44,85 +33,11 @@ const routes = [
     name: 'home',
     component: Home,
     meta:{
-      title:'Admin'
-    }
-  },
-  {
-    path: '/admin',
-    name: 'admin',
-    component: Admin,
-    meta:{
       auth:true,
-      permision:'admin',
-      title:'Admin'
+      title:'home CRUD user'
     }
   },
-  {
-    path: '/user',
-    name: 'user',
-    component: User,
-    meta:{
-      auth:true,
-      permision:'admin',
-      title:'Data User'
-    }
-  },
-  {
-    path: '/role',
-    name: 'role',
-    component: Role,
-    meta:{
-      auth:true,
-      permision:'admin',
-      title:'Data Role'
-    }
-  },
-  {
-      path: '/product',
-      name: 'product',
-      component: Product,
-      meta:{
-        auth:true,
-        permision:'admin',
-        title:'Data Product'
-    }
-  },
-  {
-    path: '/licence',
-    name: 'licence',
-    component: Licence,
-    meta:{
-      auth:true,
-      permision:'admin',
-      title:'Data licence'
-  },
-  
-  },
-  {
-    path: '/profile',
-    name: 'profile',
-    component:Profile,
-    meta:{
-      title:'Profile Anda'
-    }
-  },
-  {
-    path: '/user/licence',
-    name: 'user-licence',
-    component:userLicence,
-    meta:{
-      title:'lisensi Anda'
-    }
-  },
-  {
-    path: '/user/product',
-    name: 'user-product',
-    component:userProduct,
-    meta:{
-      title:'Produk kami'
-    }
-  },
-    { path: '/404', component: Home },  
+    { path: '/404', component: Login },  
     { path: '*', redirect: '/404' },
 
 ];
@@ -140,30 +55,13 @@ router.beforeEach( async (to,from, next) => {
     if (to.meta.auth == true) {
       try {
         await store.dispatch('profile');
-        let role = store.state.auth.profile.data.roles
-        if (role.length > 0) {
-          role.filter(role=>{
-            if (role.name == to.meta.permision) {
-              console.log('masuk')
-              return next()
-            }else{
-              return next('/login')
-            }
-        })
-        }else{
-          console.log('pindah')
-          return next('/login')
-        }
-        
+        return next()
       }catch (error) {
-        return ('/')
+        return next('/login')
       }
     }else{
       return next()
     }
-
- 
-
   });
 
 

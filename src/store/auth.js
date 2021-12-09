@@ -9,6 +9,9 @@ export default{
         },
         loading:false
     },
+    getters: {
+
+    },
     mutations:{
         setForm(state,data){
             state.profile.form=data
@@ -32,19 +35,8 @@ export default{
                 commit('setData',response.data.user)
                 localStorage.setItem("token", response.data.token)
                 commit('setLoading',false)
-                let role = response.data.user.roles
-                if (role.length > 0) {
-                  role.filter(role => {
-                      if (role.name == 'admin') {
-                          return router.push('/admin');
-                      }else{
-                          return router.push('/');
-                      }
-                  })
-                }else{
-                  return router.push('/')
-                }
-                
+                console.log(response.data.user)
+                router.push('/')                
               }
             } catch (errors) {
                 commit('setErrors',errors.response.data.errors)
@@ -53,8 +45,15 @@ export default{
         },
         async register({commit},data){
             commit('setLoading',true)
+            const formData = new FormData
+            formData.append('name',data.name)
+            formData.append('email',data.email)
+            formData.append('nik',data.nik)
+            formData.append('img',data.img)
+            formData.append('password',data.password)
+            formData.append('rePassword',data.rePassword)
             try {
-              let response = await axios.post('/api/register',data);
+              let response = await axios.post('/api/register',formData,{headers: {'Content-Type': 'multipart/form-data'}});
               if (response.status==200){
                 alert('Registrasi Berhasil')
                 commit('setForm',{})

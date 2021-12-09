@@ -34,16 +34,16 @@
             <thead>
               <tr>
                 <th class="text-left">
+                  image
+                </th>
+                <th class="text-left">
                   Username
                 </th>
                 <th class="text-left">
                   Email
                 </th>
                 <th class="text-left">
-                  No.Telpon
-                </th>
-                <th class="text-left">
-                  Role
+                  NIK
                 </th>
                 <th class="text-left">
                   Action
@@ -55,19 +55,26 @@
                 v-for="data,index in data.data"
                 :key="index"
               >
-                <td>{{data.name}}</td>
-                <td>{{data.email}}</td>
-                <td>{{data.phone}}</td>
-                <td>                
-                  <span v-for="role,index in data.roles" :key="index">
-                    <span>
-                        {{role.name}}
-                    </span>
-                  </span>
+
+                <td>
+                  <v-img
+                    :lazy-src="data.img"
+                    max-height="50"
+                    max-width="50"
+                    :src="data.img"
+                  ></v-img>
                 </td>
 
-
-                <td>      
+                <td>{{data.name}}</td>
+                <td>{{data.email}}</td>
+                <td>{{data.nik}}</td>
+                <td>   
+                    <v-icon color="blue"
+                      class="ma-1" 
+                      @click="password = true,edit=data"
+                      >
+                      mdi-key
+                    </v-icon>    
                     <v-icon color="blue"
                       class="ma-1" 
                       @click="dialog =true,edit=data"
@@ -76,7 +83,7 @@
                     </v-icon> 
                     <v-icon color="red"
                       class="ma-1" 
-                      @input="deleteUser(data)"
+                      @click="deleteUser(data)"
                       >
                       mdi-delete
                     </v-icon> 
@@ -95,13 +102,14 @@
     </v-card>
     </v-col>
   <div class="text-center">
-      <v-dialog
+    <v-dialog
       v-model="dialog"
-      width="500"
+      width="100%"
+      height="100%"
     >
       <v-card>
         <v-card-title class="text-h5 orange lighten-2">
-          Edit User "{{edit.name}}"
+          Edit User..
         </v-card-title>
 
       <v-card-text class="pa-3">
@@ -111,34 +119,57 @@
         >
         {{error}}
         </v-alert>
+        <div class="d-flex justify-center">
+        <v-img
+        class="ma-3"
+        :lazy-src="img = edit.img"
+        max-height="100"
+        max-width="100"
+        :src="img = edit.img"
+        ></v-img>
+        </div>
+                  
+        <div class="ma-3 d-flex justify-center">
+        <v-btn
+        small
+        color="info"
+        v-if="!upload"
+        @click="upload=true"
+        >
+          ganti foto ktp
+        </v-btn>
+        <v-btn
+        small
+        color="error"
+        v-if="upload"
+        @click="upload=false"
+        >
+          gagal
+        </v-btn>
+        </div>
+        <div v-if="upload" class="ma-3">
+            <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" type="file" @vdropzone-complete="afterComplete" :v-model="edit.img=img"
+            >
+            </vue-dropzone>
+        </div>
         <v-text-field
           small
           outlined
           v-model="edit.name"
-          label="Username"
+          label="Username...."
         ></v-text-field>
         <v-text-field
           small
           outlined
           v-model="edit.email"
-          label="Email"
+          label="Email...."
         ></v-text-field>
         <v-text-field
           small
           outlined
-          v-model="edit.phone"
-          label="No.Telpon"
+          v-model="edit.nik"
+          label="Nomor Induk Kependudukan..."
         ></v-text-field>
-        <v-select
-          small
-          :items="roles"
-          item-text="name"
-          item-value="id"
-          label="Pilih role ..."
-          v-model="edit.role"
-          outlined
-        ></v-select>
-        
       </v-card-text>
 
         <v-divider></v-divider>
@@ -162,6 +193,64 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+        <v-dialog
+      v-model="password"
+      width="100%"
+      height="100%"
+    >
+      <v-card>
+        <v-card-title class="text-h5 orange lighten-2">
+          Edit User..
+        </v-card-title>
+
+      <v-card-text class="pa-3">
+        <v-alert
+          type="error"
+          v-for="[error] in errors" :key="error"
+        >
+        {{error}}
+        </v-alert>
+        <v-text-field
+          small
+          outlined
+          v-model="edit.oldPassword"
+          label="Password lama ..."
+        ></v-text-field>
+        <v-text-field
+          small
+          outlined
+          v-model="edit.newPassword"
+          label="Password baru ..."
+        ></v-text-field>
+        <v-text-field
+          small
+          outlined
+          v-model="edit.rePassword"
+          label="Ulangi password baru ..."
+        ></v-text-field>
+      </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-btn
+            color="error"
+            small
+            @click="password=false"
+          >
+            tutup
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            small
+            @click="passwordUser(edit)"
+          >
+            simpan data
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
   </v-row>
   </v-container>
@@ -170,15 +259,36 @@
 </template>
 <script>
 import axios from 'axios'
+import vue2Dropzone from 'vue2-dropzone'
+import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 
-  export default {
+export default {
+  components:{
+    vueDropzone: vue2Dropzone
+  },
     data () {
       return {
         success: false,
         model: null,
         dialog: false,
         edit: false,
-        roles:{}
+        img:null,
+        password:null,
+        upload:false,
+        dropzoneOptions: {
+          url: 'https://httpbin.org/post',
+          thumbnailWidth: 300,
+          maxFiles: 1,
+          addRemoveLinks: true,
+          acceptedFiles: ".png,.jpg,.jpeg",
+          dictDefaultMessage: "Upload Foto KTP",
+          init : function() {
+            this.on("maxfilesexceeded", function(file) {
+                  this.removeAllFiles();
+                  this.addFile(file);
+            });
+          }
+      }
       }
     },
     computed:{
@@ -199,25 +309,37 @@ import axios from 'axios'
       async getUser(data){
         await this.$store.dispatch('user',data.current_page);
       },
-      async getRole(){
-            try{
-                let response = await axios.get('/api/role',{headers: {'Authorization': 'Bearer '+localStorage.getItem('token')}})
-                if (response.status == 200) {
-                    this.roles = response.data.role
-                }
-            }catch(errors){
-              console.log(errors)
-            }
-      },
       async editUser(data){
         await this.$store.dispatch('editUser',data);
         await this.getUser(this.data.current_page)
+      },
+      async passwordUser(data){
+        await this.$store.dispatch('editPasswordUser',data);
+        await this.getUser(this.data.current_page)
+      },
+      async deleteUser(data){
+        await this.$store.dispatch('deleteUser',data);
+        await this.getUser(this.data.current_page)
+      },
+      async afterComplete(file){
+        try {
+            const formData = new FormData()
+            formData.append('img',file)
+            console.log(file)
+          let response = await axios.post('/api/user/image/'+this.edit.id,formData,{headers: {'Content-Type': 'multipart/form-data','Authorization': 'Bearer '+localStorage.getItem('token')}})          
+          if (response.status==200) {
+            console.log(response.data)
+            this.edit.img = response.data.user.img
+            await this.getUser(this.data.current_page)
+          }
+        } catch (error) {
+          console.log(error)
+        }
+
       }
     },
     mounted() {
       this.getUser(1)
-      this.getRole()
-
     }
   }
 </script>

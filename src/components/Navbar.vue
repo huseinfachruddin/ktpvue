@@ -5,10 +5,7 @@
     <v-app-bar-nav-icon color="white" @click.stop="drawer = !drawer" ></v-app-bar-nav-icon>
       <v-spacer></v-spacer>
       <v-toolbar-title class="d-flex justify-center">
-          <v-img 
-          width="50"
-          src="../assets/ruasdigital.png" />
-      <h3 class="ma-1 white--text d-none d-sm-flex">RUAS DIGITAL LISENSI</h3>
+      <h3 class="ma-1 white--text d-none d-sm-flex">Data User</h3>
       </v-toolbar-title>
       <v-spacer></v-spacer>
 
@@ -28,7 +25,7 @@
           active-class="deep-yellow--text text--accent-4"
         >
       <v-list-item class="yellow">
-        <router-link to="/profile" style="text-decoration: none;" >
+        <router-link to="/" style="text-decoration: none;" >
         <v-list-item-content v-if="profile.name">
           <v-list-item-title class="text-h6">
             {{profile.name}}
@@ -46,67 +43,11 @@
       </v-list-item>
 
       <v-divider></v-divider>
-          <div v-if="role!='admin'">
           <router-link to="/" style="text-decoration: none;" >
               <v-list-item>
-                <v-list-item-title >Home</v-list-item-title>
+                <v-list-item-title >data User</v-list-item-title>
               </v-list-item>
           </router-link>
-          <router-link to="/user/product" style="text-decoration: none;" >
-              <v-list-item>
-                <v-list-item-title >Produk kami</v-list-item-title>
-              </v-list-item>
-          </router-link>
-          <div v-if="role!=null">
-          <router-link to="/user/licence" style="text-decoration: none;" >
-              <v-list-item>
-                <v-list-item-title >Lisensi Anda</v-list-item-title>
-              </v-list-item>
-          </router-link>
-          </div>
-          </div>
-          <div v-if="role=='admin'">
-            <router-link to="/admin" style="text-decoration: none;" >
-                <v-list-item>
-                  <v-icon>
-                    mdi-home
-                  </v-icon>
-                  <v-list-item-title >Dasboard</v-list-item-title>
-                </v-list-item>
-            </router-link>
-            <router-link to="/user" style="text-decoration: none;" >
-                <v-list-item>
-                  <v-icon>
-                    mdi-account
-                  </v-icon>
-                  <v-list-item-title >Users</v-list-item-title>
-                </v-list-item>
-            </router-link>
-            <router-link to="/role" style="text-decoration: none;" >
-                <v-list-item>
-                  <v-icon>
-                    mdi-key
-                  </v-icon>
-                  <v-list-item-title >Role</v-list-item-title>
-                </v-list-item>
-            </router-link>
-            <router-link to="/product" style="text-decoration: none;" >
-                <v-list-item>
-                  <v-icon>
-                    mdi-apps
-                  </v-icon>
-                  <v-list-item-title >Produk</v-list-item-title>
-                </v-list-item>
-            </router-link>
-            <router-link to="/licence" style="text-decoration: none;" >
-                <v-list-item>
-                  <v-icon>
-                    mdi-certificate
-                  </v-icon>
-                  <v-list-item-title >Lisensi</v-list-item-title>
-                </v-list-item>
-            </router-link>
-          </div>
           <v-list-item>
             <v-list-item-title >
               <v-btn
@@ -172,7 +113,6 @@ import axios from 'axios'
                 if (response.status == 200) {
                   this.login=true
                   this.profile=response.data.profile
-                  this.role=response.data.profile.roles.map(role=>{return role.name})
                 }
             }catch(errors){
               console.log(errors)
